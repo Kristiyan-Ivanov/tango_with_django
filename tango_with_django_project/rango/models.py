@@ -7,6 +7,7 @@ from django.template.defaultfilters import slugify
 
 # Create your models here.
 
+# Model representing the Category containing a list of Pages
 class Category(models.Model):
     name = models.CharField(max_length=128, unique=True)
     views = models.IntegerField(default=0)
@@ -24,6 +25,7 @@ class Category(models.Model):
         return self.name
 
 
+# Model representing a web page in the Rango app
 class Page(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)

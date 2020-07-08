@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from rango.models import Category
+from rango.models import Page
 
 
 def index(request):
@@ -22,3 +23,26 @@ def about(request):
     context_dict = {'boldmessage': 'Kristiyan Ivanov'}
 
     return render(request, 'rango/about.html', context=context_dict)
+
+
+def show_category(request, category_name_slug):
+    # Creates a context dictionary which we can
+    # pass to the rendering engine.
+    context_dict = {}
+
+    try:
+        # Gets category by category's slug
+        category = Category.objects.get(slug=category_name_slug)
+
+        # Retrieve all the associated pages
+        pages = Page.objects.filter(category=category)
+
+        # Adds pages and category to the context dictionary
+        context_dict['pages'] = pages
+        context_dict['category'] = category
+
+    except Category.DoesNotExist:
+        context_dict['Category'] = None
+        context_dict['Page'] = None
+
+    return render(request, 'rango/category.html', context=context_dict)
