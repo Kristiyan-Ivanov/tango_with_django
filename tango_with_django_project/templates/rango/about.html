@@ -1,22 +1,23 @@
 {% extends 'rango/base.html' %}
 {% load static %}
 
-{% block title_block %}
-    About Rango
-{% endblock %}
-
 {% block body_block %}
-    <h1>Rango says...</h1>
-    <div>
-        <p>Visits: {{ visits }}</p>
-        here is the about page. <br />
-        <strong>tutorial has been put together by {{ boldmessage }}.</strong><br />
+<div class="jumbotron p-4">
+    <div class="container-fluid">
+        <h1 class="jumbotron-heading">About Rango</h1>
+        <div>
+            <p>Visits: {{ visits }}</p>
+            here is the about page. <br/>
+            <strong>tutorial has been put together by {{ boldmessage }}.</strong><br/>
+        </div>
+        <div>
+            <img src="{% static 'images/rango.jpg' %}" alt="Picture of Rango"/>
+        </div>
+        <div>
+            <img src="{{ MEDIA_URL }}cat.jpeg"
+                 alt="Picture of Dog"/>
+        </div>
     </div>
-    <div>
-        <img src="{% static 'images/rango.jpg' %}" alt="Picture of Rango" />
-    </div>
-    <div>
-        <img src="{{ MEDIA_URL }}cat.jpeg"
-            alt="Picture of Dog" />
-    </div>
+</div>
+
 {% endblock %}
