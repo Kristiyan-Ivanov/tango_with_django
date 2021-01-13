@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm
-from datetime import datetime
 from rango.bing_search import run_query
+from datetime import datetime
 
 
 def index(request):
@@ -75,7 +76,7 @@ def show_category(request, category_name_slug):
         category = Category.objects.get(slug=category_name_slug)
 
         # Retrieve all the associated pages
-        pages = Page.objects.filter(category=category)
+        pages = Page.objects.filter(category=category).order_by('-views')
 
         # Adds pages and category to the context dictionary
         context_dict['pages'] = pages
@@ -154,6 +155,7 @@ def restricted(request):
 def search(request):
     result_list = list()
     query = ''
+
     if request.method == 'POST':
         query = request.POST['query'].strip()
         if query:
@@ -161,3 +163,20 @@ def search(request):
             result_list = run_query(query)
 
     return render(request, 'rango/search.html', {'result_list': result_list, 'query': query})
+
+
+# wrapper view used to track external redirects
+def goto_page(request):
+    page_id = request.GET.get('page_id')
+
+    try:
+        selected_page = Page.objects.get(id=page_id)
+    except Page.DoesNotExist:
+        return redirect(reverse('rango:index'))
+
+    selected_page.views = selected_page.views + 1
+    selected_page.save()
+
+    return redirect(selected_page.url)
+
+

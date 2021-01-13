@@ -53,7 +53,10 @@ Homepage
                     <ul class="list-group">
                         {% for page in pages %}
                         <li class="list-group-item">
-                            <a href="{{ page.url }}">{{ page.title }}</a>
+                            <a href="{% url 'rango:goto' %}?page_id={{ page.id }}">{{ page.title }}</a>
+                            <span class="badge badge-primary text-wrap">
+                                {{ page.views }} view{{ page.views|pluralize }}
+                            </span>
                         </li>
                         {% endfor %}
                     </ul>
