@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import F
-from rango.models import Category, Page
-from rango.forms import CategoryForm, PageForm
+from rango.models import Category, Page, UserProfile
+from rango.forms import CategoryForm, PageForm, UserProfileForm
 from rango.bing_search import run_query
 from datetime import datetime
 
@@ -71,20 +71,28 @@ def show_category(request, category_name_slug):
     # pass to the rendering engine.
     context_dict = {}
 
+    # Gets category by category's slug
     try:
-        # Gets category by category's slug
         category = Category.objects.get(slug=category_name_slug)
+        context_dict['category'] = category
+    except Category.DoesNotExist:
+        context_dict['category'] = None
+        context_dict['pages'] = None
 
+    if request.method == "GET":
         # Retrieve all the associated pages
         pages = Page.objects.filter(category=category).order_by('-views')
 
         # Adds pages and category to the context dictionary
         context_dict['pages'] = pages
-        context_dict['category'] = category
 
-    except Category.DoesNotExist:
-        context_dict['Category'] = None
-        context_dict['Page'] = None
+    elif request.method == "POST":
+        # Retrieve all the associated pages
+        pages = Page.objects.filter(category=category).filter(
+            title__icontains=request.POST['query'].strip()).order_by('-views')
+
+        # Adds pages and category to the context dictionary
+        context_dict['pages'] = pages
 
     return render(request, 'rango/category.html', context=context_dict)
 
@@ -151,18 +159,23 @@ def restricted(request):
     return render(request, 'rango/restricted.html')
 
 
+"""
+DEPRECATED
+"""
+
+
 # view responsible for the Bing search functionality
-def search(request):
-    result_list = list()
-    query = ''
-
-    if request.method == 'POST':
-        query = request.POST['query'].strip()
-        if query:
-            # Run Bing function to get the results list!
-            result_list = run_query(query)
-
-    return render(request, 'rango/search.html', {'result_list': result_list, 'query': query})
+# def search(request):
+#     result_list = list()
+#     query = ''
+#
+#     if request.method == 'POST':
+#         query = request.POST['query'].strip()
+#         if query:
+#             # Run Bing function to get the results list!
+#             result_list = run_query(query)
+#
+#     return render(request, 'rango/search.html', {'result_list': result_list, 'query': query})
 
 
 # wrapper view used to track external redirects
@@ -180,3 +193,25 @@ def goto_page(request):
     return redirect(selected_page.url)
 
 
+def register_profile(request):
+    form = UserProfileForm()
+
+    if request.method == 'POST':
+        print()
+        form = UserProfileForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            user_profile = form.save(commit=False)
+            user_profile.user = request.user
+            user_profile.save()
+            # confirmation that the category is added
+            print(user_profile.user.username)
+
+            return redirect(reverse('rango:index'))
+        else:
+            # print form contained errors to the terminal
+            print(form.errors)
+
+    # Will handle the bad form, new form, or no form supplied cases.
+    # Render the form with error messages (if any).
+    return render(request, 'rango/profile_registration.html', {'form': form})
