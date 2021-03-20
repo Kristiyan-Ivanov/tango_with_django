@@ -6,7 +6,10 @@
 <div class="jumbotron p-4">
     <div class="container-fluid">
         <h1 class="jumbotron-heading">{{ category.name }}</h1>
-        {% if pages %}
+    </div>
+</div>
+<div>
+    {% if pages %}
         <ul>
             {% for page in pages %}
             <li>
@@ -18,26 +21,46 @@
             {% endfor %}
         </ul>
         {% else %}
-        <strong>No pages currently in category</strong> <br>
+        <strong>No pages found!</strong> <br>
         {% endif %}
 
         {% if user.is_authenticated %}
         <a type="button" class="btn btn-primary" href="{% url 'rango:add_page' category.slug %}">
             Add page</a><br><br>
         <div>
+            <p><strong>You don't find the page you need? Here, search the web for it.</strong></p>
             <form class="form-inline" id="user-form" method="post" action=".">
                 {% csrf_token %}
                 <div class="form-group">
-                    <input class="form-control" type="text" size="50" name="query" id="query"
+                    <input class="form-control" type="text" size="50" name="query" id="query_id"
                            value="{{ query }}">
                     <button class="btn btn-primary" type="submit" name="submit">
                     Search
                     </button>
                 </div>
             </form>
-         </div>
+        </div>
+        <div>
+            {% if result_list %}
+                <br>
+                <h2>Results</h2>
+                <div class="list-group">
+                    {% for result in result_list %}
+                        <div class="list-group-item">
+                            <h3 class="list-group-item-heading">
+                                <a href="{{ result.link }}">
+                                    {{ result.title|safe|escape }}
+                                </a>
+                            </h3>
+                            <p class="list-item-group-text">
+                                {{ result.summary|safe|escape }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
         {% endif %}
-    </div>
 </div>
 {% else %}
 The specific category does not exist.

@@ -1,0 +1,37 @@
+{% extends 'rango/base.html'%}
+{% load static %}
+
+{% block body_block %}
+    {% if selected_user %}
+        <div class="jumbotron p-4">
+            <div class="container-fluid">
+                    <h2>{{ selected_user.username }}'s Profile</h2>
+            </div>
+        </div>
+        {% if user_profile %}
+            {% if user_profile.picture %}
+                <img src="{{ user_profile.picture.url }}" alt="Profile Pic" width="300" height="300">
+            {% else %}
+                <img src="{{ MEDIA_URL }}/blank-profile.jpg" width="300" height="300" alt="Placeholder image" />
+            {% endif %}
+            <p><strong>Website: </strong><a href="{{ user_profile.website }}">{{ user_profile.website }}</a></p>
+        {% endif %}
+        <p><strong>E-mail: </strong>{{ selected_user.email }}</p>
+        {% if selected_user == user %}
+            <form method="post" action="." enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                {% if form.errors %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                        <button class="btn btn-primary" type="submit" value="Update Profile">Update Profile</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p>User does not exists!</p>
+    {% endif%}
+{% endblock %}
