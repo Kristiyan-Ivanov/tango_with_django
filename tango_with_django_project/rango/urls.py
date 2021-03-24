@@ -12,7 +12,7 @@ urlpatterns = [
     path('category/<slug:category_name_slug>/add_page/', AddPageView.as_view(), name='add_page'),
     path('restricted/', views.restricted, name='restricted'),
     path('goto/', views.goto_page, name='goto'),
-    path('register_profile/', views.register_profile, name='register_profile'),
+    path('register_profile/', RegisterProfileView.as_view(), name='register_profile'),
     path('profile/<str:username>/', ProfileView.as_view(), name='profile'),
     path('users/', ListUsersView.as_view(), name='users'),
 ]

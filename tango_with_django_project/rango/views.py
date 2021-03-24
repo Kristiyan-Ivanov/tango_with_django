@@ -225,7 +225,7 @@ class ProfileView(TemplateView):
 class ListUsersView(TemplateView):
 
     def get(self, request):
-        users = User.objects.filter(is_staff=False).order_by('username')
+        users = UserProfile.objects.filter(user__is_staff=False).order_by('user__username')
         context_dict = {'users': users}
 
         return render(request, 'rango/users.html', context_dict)

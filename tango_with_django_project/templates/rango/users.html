@@ -13,9 +13,17 @@
 </div>
 <div>
     {% if users %}
-    {% for user_profile in users %}
+    {% for user in users %}
     <ul>
-        <li><strong><a href="{% url 'rango:profile' user_profile.username %}">{{ user_profile.username }}</a></strong></li>
+        <li><strong>
+            <a href="{% url 'rango:profile' user.user.username %}">
+                {% if user.picture %}
+                    <img src="{{ user.picture.url }}" height="50" width="50" >
+                {% else %}
+                    <img src="{{ MEDIA_URL }}/blank-profile.jpg" width="50" height="50" alt="Placeholder image" />
+                {% endif %}
+                    {{ user.user.username }}
+            </a></strong></li>
     </ul>
     {% endfor %}
     {% endif %}
