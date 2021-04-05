@@ -34,6 +34,9 @@ Homepage
                         <li class="list-group-item">
                             <a href="{% url 'rango:show_category' category.slug %}">
                                 {{ category.name }}</a>
+                            <span class="badge badge-primary text-wrap">
+                                {{ category.likes }} like{{ category.likes|pluralize }}
+                            </span>
                         </li>
                         {% endfor %}
                     </ul>

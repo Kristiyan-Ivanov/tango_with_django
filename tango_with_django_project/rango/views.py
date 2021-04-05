@@ -8,6 +8,7 @@ from rango.forms import CategoryForm, PageForm, UserProfileForm
 from django.views.generic import TemplateView
 from datetime import datetime
 from rango.bing_search import BingSearch
+from django.http import HttpResponse
 
 
 class IndexView(TemplateView):
@@ -77,6 +78,33 @@ class ShowCategoryView(TemplateView):
         return render(request, 'rango/category.html', context=context_dict)
 
 
+class CategorySuggestionView(TemplateView):
+
+    def get(self, request):
+        if 'suggestion' in request.GET:
+            suggestion = request.GET['suggestion']
+        else:
+            suggestion = ''
+
+        category_list = get_category_list(max_results=8, starts_with=suggestion)
+
+        if len(category_list) == 0:
+            category_list = Category.objects.order_by('-likes')
+
+        return render(request, 'rango/categories.html', {'categories': category_list})
+
+
+def get_category_list(max_results=0, starts_with=''):
+    category_list = []
+    if starts_with:
+        category_list = Category.objects.filter(name__istartswith=starts_with)
+    if max_results > 0:
+        if len(category_list) > max_results:
+            category_list = category_list[:max_results]
+
+    return category_list
+
+
 class AddCategoryView(TemplateView):
 
     @method_decorator(login_required)
@@ -100,6 +128,23 @@ class AddCategoryView(TemplateView):
             print(form.errors)
 
         return render(request, 'rango/add_category.html', {'form': form})
+
+
+class LikeCategoryView(TemplateView):
+
+    @method_decorator(login_required)
+    def get(self, request):
+        category_id = request.GET['category_id']
+        try:
+            category = Category.objects.get(id=int(category_id))
+        except Category.DoesNotExist:
+            return HttpResponse(-1)
+        except ValueError:
+            return HttpResponse(-1)
+
+        category.likes = category.likes + 1
+        category.save()
+        return HttpResponse(category.likes)
 
 
 class AddPageView(TemplateView):
@@ -229,6 +274,28 @@ class ListUsersView(TemplateView):
         context_dict = {'users': users}
 
         return render(request, 'rango/users.html', context_dict)
+
+
+class AddBingSearchPageView(TemplateView):
+
+    @method_decorator(login_required)
+    def get(self, request):
+        url = request.GET['page_url']
+        title = request.GET['title']
+        category_id = request.GET['category_id']
+
+        try:
+            category = Category.objects.get(id=int(category_id))
+        except Category.DoesNotExist:
+            return HttpResponse('Error - category not found.')
+
+        page, just_created = Page.objects.get_or_create(url=url, category=category)
+        if just_created:
+            page.title = title
+            page.save()
+
+        pages = Page.objects.filter(category_id=category_id).order_by('-views')
+        return render(request, 'rango/list_pages.html', {'pages': pages})
 
 
 def get_server_side_cookie(request, cookie, default_val=None):

@@ -15,4 +15,7 @@ urlpatterns = [
     path('register_profile/', RegisterProfileView.as_view(), name='register_profile'),
     path('profile/<str:username>/', ProfileView.as_view(), name='profile'),
     path('users/', ListUsersView.as_view(), name='users'),
+    path('like_category/', views.LikeCategoryView.as_view(), name='like_category'),
+    path('suggest/', views.CategorySuggestionView.as_view(), name='suggest'),
+    path('search_add_page/', views.AddBingSearchPageView.as_view(), name='search_add_page'),
 ]

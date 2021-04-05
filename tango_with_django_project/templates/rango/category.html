@@ -1,32 +1,29 @@
 {% extends 'rango/base.html' %}
 {% load static %}
+{% load rango_template_tags %}
 
 {% block body_block %}
 {% if category %}
 <div class="jumbotron p-4">
     <div class="container-fluid">
         <h1 class="jumbotron-heading">{{ category.name }}</h1>
+        <div>
+            <strong id="like_count">{{ category.likes }}</strong> likes
+            {% if user.is_authenticated %}
+            <button id="like_btn" data-categoryid="{{ category.id }}" class="btn btn-primary btn-sm" type="button">
+                <span data-feather="thumbs-up"></span>
+                Like Category
+            </button>
+            {% endif %}
+        </div>
     </div>
 </div>
 <div>
-    {% if pages %}
-        <ul>
-            {% for page in pages %}
-            <li>
-                <a href="{% url 'rango:goto' %}?page_id={{ page.id }}">{{ page.title }}</a>
-                <span class="badge badge-primary text-wrap">
-                    {{ page.views }} view{{ page.views|pluralize }}
-                </span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <strong>No pages found!</strong> <br>
-        {% endif %}
+    <div id="list_pages">
+        {% get_pages_list category.id %}
+    </div>
 
-        {% if user.is_authenticated %}
-        <a type="button" class="btn btn-primary" href="{% url 'rango:add_page' category.slug %}">
-            Add page</a><br><br>
+    {% if user.is_authenticated %}
         <div>
             <p><strong>You don't find the page you need? Here, search the web for it.</strong></p>
             <form class="form-inline" id="user-form" method="post" action=".">
@@ -51,6 +48,10 @@
                                 <a href="{{ result.link }}">
                                     {{ result.title|safe|escape }}
                                 </a>
+                                <a type="button" class="btn btn-info btn-sm search-page-add"
+                                   data-url="{{ result.link }}"
+                                   data-title="{{ result.title }}"
+                                   data-categoryid="{{ category.id }}">Add</a>
                             </h3>
                             <p class="list-item-group-text">
                                 {{ result.summary|safe|escape }}
@@ -60,7 +61,7 @@
                 </div>
             {% endif %}
         </div>
-        {% endif %}
+    {% endif %}
 </div>
 {% else %}
 The specific category does not exist.
