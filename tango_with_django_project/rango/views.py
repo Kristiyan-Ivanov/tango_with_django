@@ -9,6 +9,7 @@ from django.views.generic import TemplateView
 from datetime import datetime
 from rango.bing_search import BingSearch
 from django.http import HttpResponse
+from django.utils.timezone import now
 
 
 class IndexView(TemplateView):
@@ -316,6 +317,7 @@ def goto_page(request):
         return redirect(reverse('rango:index'))
 
     selected_page.views = selected_page.views + 1
+    selected_page.last_visited = now()
     selected_page.save()
 
     return redirect(selected_page.url)
