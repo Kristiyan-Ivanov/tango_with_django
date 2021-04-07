@@ -8,3 +8,4 @@ thumbs.db
 venv
 profile_images/
 htmlcov/
+.coverage
