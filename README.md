@@ -1,7 +1,7 @@
 # tango_with_django
 Implementation of the Rango website from the book Tango with Django 2
 
-**Requirements**
+**Requirements**  
 asgiref==3.3.1  
 certifi==2020.6.20  
 chardet==3.0.4  
