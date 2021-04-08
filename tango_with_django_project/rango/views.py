@@ -217,7 +217,7 @@ class RegisterProfileView(TemplateView):
 
 class ProfileView(TemplateView):
 
-    def get_user_details(username):
+    def get_user_details(self, username):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
@@ -233,16 +233,17 @@ class ProfileView(TemplateView):
 
     @method_decorator(login_required)
     def get(self, request, username):
+        context_dict = dict()
         try:
             user, user_profile, form = self.get_user_details(username)
+
+            context_dict = {
+                'user_profile': user_profile,
+                'selected_user': user,
+                'form': form
+            }
         except TypeError:
             redirect(reverse('rango:index'))
-
-        context_dict = {
-            'user_profile': user_profile,
-            'selected_user': user,
-            'form': form
-        }
 
         return render(request, 'rango/profile.html', context_dict)
 
