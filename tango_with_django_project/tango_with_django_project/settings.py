@@ -32,7 +32,7 @@ SECRET_KEY = 'j(vx_1bk8ovrw*84pa!2^3l$f-0&1tsshhx95#(^f+&p8wy4ap'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://absterius.pythonanywhere.com/']
 
 # Application definition
 
